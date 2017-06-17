@@ -11,8 +11,6 @@ void PrintIntroduction();
 void PlayGame();
 bool AskToPlayAgain();
 FText ReadGuess();
-void PrintGuess(FText);
-FText GetAndPrintGuess();
 
 // Globals
 
@@ -37,10 +35,11 @@ int main()
 
 void PrintIntroduction()
 {
-	constexpr int32 WORD_LENGTH = 5;
-	std::cout << "Welcome to Bulls & Cows, a fun game!" << std::endl;
-	std::cout << "Can you guess the " << WORD_LENGTH;
-	std::cout << "-letter isogram I'm thinking of?" << std::endl;
+	int32 WordLen = BCGame.GetHiddenWordLen();
+	std::cout << "Welcome to Bulls & Cows, a fun word game." << std::endl;
+	std::cout << "Can you guess the " << WordLen;
+	std::cout << "-letter isogram I'm thinking of?";
+	std::cout << std::endl << std::endl;
 	return;
 }
 
@@ -49,10 +48,22 @@ void PlayGame()
 	BCGame.Reset();
 	int32 MaxTries = BCGame.GetMaxTries();
 	std::cout << "Maximum tries: " << MaxTries << std::endl;
-	while (BCGame.GetCurrentTry() <= MaxTries)
+
+	for (int32 i = 0; i < MaxTries; i++)
 	{
 		FText Guess = ReadGuess();
-		PrintGuess(Guess);
+		auto BullCowCount = BCGame.SubmitGuess(Guess);
+
+		if (BCGame.GetHiddenWordLen() == BullCowCount.Bulls)
+		{
+			std::cout << "The word was " << BCGame.GetHiddenWord() << "\n";
+			std::cout << "You win!" << std::endl;
+			return;
+		}
+
+		std::cout << "Bulls: " << BullCowCount.Bulls << std::endl;
+		std::cout << "Cows: " << BullCowCount.Cows << std::endl;
+
 		std::cout << std::endl;
 	}
 }
@@ -76,11 +87,5 @@ FText ReadGuess()
 	int32 CurrentTry = BCGame.GetCurrentTry();
 	std::cout << "[Attempt " << CurrentTry << "] Enter your guess: ";
 	std::getline(std::cin, Guess);
-	BCGame.IncrementCurrentTry();
 	return Guess;
-}
-
-void PrintGuess(FText g)
-{
-	std::cout << "You guessed: " << g << std::endl;
 }

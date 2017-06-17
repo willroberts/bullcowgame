@@ -15,10 +15,11 @@ class FBullCowGame
 public:
 	FBullCowGame();
 
-	int GetMaxTries() const;
-	int GetCurrentTry() const;
+	int32 GetMaxTries() const;
+	int32 GetCurrentTry() const;
 	FString GetHiddenWord() const;
-	bool IsGameWon() const;
+	int32 GetHiddenWordLen() const;
+	bool IsGameWon(FString) const;
 	bool IsGuessValid(FString) const;
 
 	void IncrementCurrentTry();
@@ -26,7 +27,7 @@ public:
 	void Reset();
 
 private:
-	int MyCurrentTry;
-	int MyMaxTries;
+	int32 MyCurrentTry;
+	int32 MyMaxTries;
 	FString MyHiddenWord;
 };
