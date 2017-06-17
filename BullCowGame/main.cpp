@@ -1,18 +1,17 @@
+#pragma once
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include "FBullCowGame.h"
 
+// Unreal Engine helpers.
 using int32 = int;
 using FText = std::string;
-
-// Prototypes
 
 void PrintIntroduction();
 void PlayGame();
 bool AskToPlayAgain();
 FText ReadGuess();
-
-// Globals
 
 FBullCowGame BCGame;
 
@@ -31,12 +30,17 @@ int main()
 	return 0;
 }
 
-// Implementations
-
 void PrintIntroduction()
 {
 	int32 WordLen = BCGame.GetHiddenWordLen();
-	std::cout << "Welcome to Bulls & Cows, a fun word game." << std::endl;
+	std::cout << "Welcome to Bulls & Cows, a fun word game.\n" << std::endl;
+	
+	std::cout << "    ^__^\n";
+	std::cout << "    (oo)\\_______\n";
+	std::cout << "    (__)\\       )\\ / \\\n";
+	std::cout << "        ||----w |\n";
+	std::cout << "        ||     ||\n" << std::endl;
+
 	std::cout << "Can you guess the " << WordLen;
 	std::cout << "-letter isogram I'm thinking of?";
 	std::cout << std::endl << std::endl;
@@ -47,25 +51,24 @@ void PlayGame()
 {
 	BCGame.Reset();
 	int32 MaxTries = BCGame.GetMaxTries();
-	std::cout << "Maximum tries: " << MaxTries << std::endl;
 
 	for (int32 i = 0; i < MaxTries; i++)
 	{
 		FText Guess = ReadGuess();
 		auto BullCowCount = BCGame.SubmitGuess(Guess);
 
-		if (BCGame.GetHiddenWordLen() == BullCowCount.Bulls)
+		if (BCGame.IsGameWon())
 		{
 			std::cout << "The word was " << BCGame.GetHiddenWord() << "\n";
 			std::cout << "You win!" << std::endl;
 			return;
 		}
 
-		std::cout << "Bulls: " << BullCowCount.Bulls << std::endl;
-		std::cout << "Cows: " << BullCowCount.Cows << std::endl;
-
-		std::cout << std::endl;
+		std::cout << "Bulls: " << BullCowCount.Bulls << ", ";
+		std::cout << "Cows: " << BullCowCount.Cows << "\n" << std::endl;
 	}
+
+	std::cout << "You lose! The word was " << BCGame.GetHiddenWord() << std::endl;
 }
 
 bool AskToPlayAgain()
@@ -73,7 +76,8 @@ bool AskToPlayAgain()
 	FText Response = "";
 	std::cout << "Play again? ";
 	std::getline(std::cin, Response);
-	if (Response[0] == 'y' || Response[0] == 'Y') {
+	if (Response[0] == 'y' || Response[0] == 'Y')
+	{
 		return true;
 	}
 	else {
@@ -83,9 +87,32 @@ bool AskToPlayAgain()
 
 FText ReadGuess()
 {
+	bool bValid = false;
 	FText Guess = "";
 	int32 CurrentTry = BCGame.GetCurrentTry();
-	std::cout << "[Attempt " << CurrentTry << "] Enter your guess: ";
-	std::getline(std::cin, Guess);
+
+	while (!bValid)
+	{
+		std::cout << "[Attempt " << CurrentTry;
+		std::cout << " of " << BCGame.GetMaxTries() << "] ";
+		std::cout << "Enter your guess : ";
+		std::getline(std::cin, Guess);
+
+		switch (BCGame.IsGuessValid(Guess))
+		{
+		case EWordStatus::InvalidLength:
+			std::cout << "Invalid guess length!\n";
+			break;
+		case EWordStatus::NotIsogram:
+			std::cout << "Word is not an isogram!\n";
+			break;
+		default:
+			bValid = true;
+			break;
+		}
+	}
+
+	// Convert Guess to lowercase.
+	std::transform(Guess.begin(), Guess.end(), Guess.begin(), ::tolower);
 	return Guess;
 }

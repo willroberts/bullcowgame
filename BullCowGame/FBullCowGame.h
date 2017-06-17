@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 
+// Unreal Engine helpers.
 using int32 = int;
 using FString = std::string;
 
@@ -10,6 +11,17 @@ struct FBullCowCount
 	int32 Cows = 0;
 };
 
+/* EWordStatus stores the result of guess validation.
+*/
+enum class EWordStatus
+{
+	OK,
+	InvalidLength,
+	NotIsogram
+};
+
+/* FullCowGame represents our game state and logic.
+*/
 class FBullCowGame
 {
 public:
@@ -19,8 +31,8 @@ public:
 	int32 GetCurrentTry() const;
 	FString GetHiddenWord() const;
 	int32 GetHiddenWordLen() const;
-	bool IsGameWon(FString) const;
-	bool IsGuessValid(FString) const;
+	bool IsGameWon() const;
+	EWordStatus IsGuessValid(FString) const;
 
 	void IncrementCurrentTry();
 	FBullCowCount SubmitGuess(FString);
@@ -28,6 +40,6 @@ public:
 
 private:
 	int32 MyCurrentTry;
-	int32 MyMaxTries;
 	FString MyHiddenWord;
+	bool bGameIsWon;
 };

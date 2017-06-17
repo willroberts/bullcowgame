@@ -1,7 +1,11 @@
+#pragma once
 #include <iostream>
+#include <map>
 #include <string>
 #include "FBullCowGame.h"
 
+// Unreal Engine helpers.
+#define TMap std::map
 using FString = std::string;
 
 FBullCowGame::FBullCowGame() {
@@ -9,8 +13,17 @@ FBullCowGame::FBullCowGame() {
 }
 
 int32 FBullCowGame::GetMaxTries() const
-{ 
-	return MyMaxTries;
+{
+	// Use the word length for the number of tries.
+	// TODO: Use a scaling function which matches TMap.
+	TMap<int32, int32> WLenToMaxTries{
+		{3,4},
+		{4,7},
+		{5,10},
+		{6,16},
+		{7,20}
+	};
+	return GetHiddenWordLen();
 };
 
 int32 FBullCowGame::GetCurrentTry() const 
@@ -28,22 +41,30 @@ int32 FBullCowGame::GetHiddenWordLen() const
 	return MyHiddenWord.length();
 }
 
-bool FBullCowGame::IsGameWon(FString Guess) const 
+bool FBullCowGame::IsGameWon() const 
 {
-	if (Guess == MyHiddenWord)
-	{
-		return true;
-	}
-	return false;
+	return bGameIsWon;
 };
 
-bool FBullCowGame::IsGuessValid(FString Guess) const
+EWordStatus FBullCowGame::IsGuessValid(FString Guess) const
 {
-	if (Guess.length() == MyHiddenWord.length())
+	// Determine if the guess has the correct length.
+	if (Guess.length() != MyHiddenWord.length())
 	{
-		return true;
+		return EWordStatus::InvalidLength;
 	}
-	return false;
+
+	// Determine if the guess is an isogram.
+	TMap<char, bool> LetterSeen;
+	for (const char c : Guess)
+	{
+		if (LetterSeen[c] == true) {
+			return EWordStatus::NotIsogram;
+		}
+		LetterSeen[c] = true;
+	}
+
+	return EWordStatus::OK;
 };
 
 void FBullCowGame::IncrementCurrentTry()
@@ -53,15 +74,9 @@ void FBullCowGame::IncrementCurrentTry()
 
 FBullCowCount FBullCowGame::SubmitGuess(FString Guess)
 {
+	IncrementCurrentTry();
 	FBullCowCount BullCowCount;
 
-	if (!IsGuessValid(Guess))
-	{
-		std::cout << "Invalid guess length!\n";
-		return BullCowCount;
-	}
-
-	IncrementCurrentTry();
 	auto WLen = MyHiddenWord.length();
 	for (int32 WChar = 0; WChar < WLen; WChar++)
 	{
@@ -81,16 +96,23 @@ FBullCowCount FBullCowGame::SubmitGuess(FString Guess)
 		}
 	}
 
+	// Detect victory.
+	if (WLen == BullCowCount.Bulls)
+	{
+		bGameIsWon = true;
+	}
+
 	return BullCowCount;
 }
 
-void FBullCowGame::Reset() {
-	constexpr int MAX_TRIES = 8;
-	MyMaxTries = MAX_TRIES;
+void FBullCowGame::Reset()
+{
 	MyCurrentTry = 1;
 
 	const FString HIDDEN_WORD = "planet";
 	MyHiddenWord = HIDDEN_WORD;
+
+	bGameIsWon = false;
 
 	return;
 }
