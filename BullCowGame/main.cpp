@@ -33,7 +33,9 @@ int main()
 void PrintIntroduction()
 {
 	int32 WordLen = BCGame.GetHiddenWordLen();
-	std::cout << "Welcome to Bulls & Cows, a fun word game.\n" << std::endl;
+	std::cout << "Welcome to Bulls & Cows, a fun word game.\n";
+	std::cout << "A \"bull\" is a correct letter in the correct position.\n";
+	std::cout << "A \"cow\" is a correct letter in the wrong position.\n" << std::endl;
 	
 	std::cout << "    ^__^\n";
 	std::cout << "    (oo)\\_______\n";
@@ -41,9 +43,8 @@ void PrintIntroduction()
 	std::cout << "        ||----w |\n";
 	std::cout << "        ||     ||\n" << std::endl;
 
-	std::cout << "Can you guess the " << WordLen;
-	std::cout << "-letter isogram I'm thinking of?";
-	std::cout << std::endl << std::endl;
+	std::cout << "Can you guess the " << WordLen << "-letter isogram I'm thinking of?\n";
+	std::cout << "An isogram is a word with no repeating letters.\n" << std::endl;
 	return;
 }
 
@@ -68,13 +69,14 @@ void PlayGame()
 		std::cout << "Cows: " << BullCowCount.Cows << "\n" << std::endl;
 	}
 
-	std::cout << "You lose! The word was " << BCGame.GetHiddenWord() << std::endl;
+	std::cout << "You lose!" << std::endl;
+	//std::cout << "The word was " << BCGame.GetHiddenWord() << std::endl;
 }
 
 bool AskToPlayAgain()
 {
 	FText Response = "";
-	std::cout << "Play again? ";
+	std::cout << "Play again? [y/n] ";
 	std::getline(std::cin, Response);
 	if (Response[0] == 'y' || Response[0] == 'Y')
 	{

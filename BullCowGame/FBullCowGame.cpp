@@ -23,7 +23,7 @@ int32 FBullCowGame::GetMaxTries() const
 		{6,16},
 		{7,20}
 	};
-	return GetHiddenWordLen();
+	return WLenToMaxTries[GetHiddenWordLen()];
 };
 
 int32 FBullCowGame::GetCurrentTry() const 
